@@ -36,23 +36,76 @@ Generic programming is yet another programming paradigm supported by C++. It sha
 
 ### Basic syntax
 
+***Our goal is to completely understand the code below!***
+
 ```C++
 #include <iostream>
+#include <typeinfo>
 
 using namespace std;
 
-void say();
+void swap(int, int);
+void swap(int*, int*);
+void swapPointer(int*, int*);
+void swapReference(int&, int&);
 
-int main() {
-	say(); // say something
-	
-	reurn 0;
+void output(int a, int b) {
+    cout << "a: " << a << endl
+         << "b: " << b << endl << endl;
 }
 
-void say() {
-	cout << "Come and get your love~";
-	cout << endl;
-	cout << "You won't regret it!" << endl;
+int main() {
+	int a, b;
+    cin >> a >> b;
+    
+    cout << "Before swap: " << endl;
+    output(a, b);
+    
+    swap(a, b);
+    cout << "After swap(int, int): " << endl;
+    output(a, b);
+    
+    swap(&a, &b);
+    cout << "After swap(int*, int*)" << endl;
+    output(a, b);
+    
+    swapPointer(&a, &b);
+    cout << "After swapPointer(int*, int*)" << endl;
+    output(a, b);
+    
+    swapReference(a, b);
+    cout << "After swapReference(int&, int&)" << endl;
+    output(a, b);
+	
+	return 0;
+}
+
+void swap(int a, int b) {
+    int tmp = a;
+    a = b;
+   	b = tmp;
+}
+
+void swap(int* a, int* b) {
+    auto tmp = a;
+    a = b;
+    b = a;
+    
+    cout << typeid(tmp).name() << endl;
+}
+
+void swapPointer(int* a, int*b) {
+    int tmp = *a;
+    *a = *b;
+   	*b = tmp;
+}
+
+void swapReference(int& a, int& b) {
+    auto tmp = a;
+    a = b;
+    b = tmp;
+    
+    cout << typeid(tmp).name() << endl;
 }
 ```
 
@@ -122,7 +175,41 @@ void say() {
 
 - ***function***
 
-  C U later
+  ​	Because functions are the modules from which C++ programs are built and because they are essential to C++ OOP definitions, you should become thoroughly familiar with them. Some aspects of functions are advanced topics, so the main discussion of functions comes later (maybe, it depends on whether we will explain the template to you.).
+  
+  ​	However, if we deal now with some basic characteristics of functions, you’ll be more at ease and more practiced with functions later.
+  
+  - ***function form***
+  
+    ```cpp
+    returnType functionName(argumentList) {
+    	statements;
+    }
+    ```
+  
+    If return type is `void`, that means the function returns nothing. Similarly, if the argument is `void`, then it means that the arguments are not accepted, and `foo(void)` and `foo()` have the same meaning. However, it should be noted that in C, the argumentList is empty, which means silence to accept arguments, rather than not accepting the arguments, unless explicitly declared as `foo(void)`
+  
+    ```cpp
+    ...
+    void foo() { printf("Function running\n"); }
+    ...
+    foo(1);
+    ...
+    // In C++
+    error: too many arguments to function 'void foo()'
+         foo(1);
+    note: declared here
+    void foo() { printf("Running\n"); }
+    
+    /* In C */
+    Function running
+    ```
+  
+  - ***function header***
+  
+  - ***funtion reload***
+  
+    
 
 
 
@@ -142,9 +229,39 @@ void say() {
   auto y = 1.3e12L;	// y is long double
   ```
 
-  However, this automatic type deduction isn’t really intended for such simple cases. Indeed, you might even go astray.
+  However, this automatic type deduction isn’t really intended for such simple cases. Indeed, you might even go astray. Only use when the type is obvious or when the type is annoyingly verbose to write out.
+
+  ```c++
+  #include <iostream>
+  #include <string>
+  #include <map>
+  #include <unordered_map>
+  #include <vector>
+  
+  int main() {
+  	std::map<std::string, std::vector<std::pair<int, std::unordered_map<char, double> > > complexType;
+  	
+      // What does this do? We'll find out in the iterators lecture!
+  	std::map<std::string, std::vector<std::pair<int, std::unordered_map<char, double> > >::iterator it = complexType.begin();;
+  	
+  	// vs
+  	auto it = complexType.begin();
+  	
+  	return 0;
+  }
+  ```
+
+  
+
+- ***array***
+
+- ***pointer***
 
 - ***reference***
+
+- ***struct***
+
+- ***class***
 
   
 
