@@ -49,9 +49,9 @@ void swap(int*, int*);
 void swapPointer(int*, int*);
 void swapReference(int&, int&);
 
-void output(int a, int b) {
-    cout << "a: " << a << endl
-         << "b: " << b << endl << endl;
+void output(int p, int q) {
+    cout << "a: " << p << endl
+         << "b: " << q << endl << endl;
 }
 
 int main() {
@@ -175,7 +175,7 @@ void swapReference(int& a, int& b) {
 
 - ***function***
 
-  ​	Because functions are the modules from which C++ programs are built and because they are essential to C++ OOP definitions, you should become thoroughly familiar with them. Some aspects of functions are advanced topics, so the main discussion of functions comes later (maybe, it depends on whether we will explain the template to you.).
+  ​	Because functions are the modules from which C++ programs are built and because they are essential to C++ OOP definitions, you should become thoroughly familiar with them. Some aspects of functions are advanced topics, so the main discussion of functions comes later (maybe).
   
   ​	However, if we deal now with some basic characteristics of functions, you’ll be more at ease and more practiced with functions later.
   
@@ -187,7 +187,7 @@ void swapReference(int& a, int& b) {
     }
     ```
   
-    If return type is `void`, that means the function returns nothing. Similarly, if the argument is `void`, then it means that the arguments are not accepted, and `foo(void)` and `foo()` have the same meaning. However, it should be noted that in C, the argumentList is empty, which means silence to accept arguments, rather than not accepting the arguments, unless explicitly declared as `foo(void)`
+    ​	If return type is `void`, that means the function returns nothing, you can use `return;` statement to end the function, or let the program run to the end of the function automatically. Similarly, if the argument is `void`, then it means that the arguments are not accepted, and `foo(void)` and `foo()` have the same meaning. However, it should be noted that in C, the argumentList is empty, which means silence to accept arguments, rather than not accepting the arguments, unless explicitly declared as `foo(void)`
   
     ```cpp
     ...
@@ -207,8 +207,146 @@ void swapReference(int& a, int& b) {
   
   - ***function header***
   
-  - ***funtion reload***
+    ​	The `output()` function in code has this header
   
+    ```cpp
+    void output(int p, int q);
+    ```
+  
+    ​	As we said before, the initial void means that little poor `output()` has no return value. So you can't use it this way:
+  
+    ```cpp
+    auto var = output(a, b);
+    
+    error: 'void var' has incomplete type
+       21 |     auto var = output(a, b);
+    ```
+  
+    ​	The `int p, int q` within the parentheses means that you are expected to use `output()` with two arguments of type int. The `p, q` are new variables assigned the value passed during a function call.
+  
+    ​	What's more, `a, b` in the function call are `argument / actual parameter`, `p, q` in the function header are `parameter / formal parameter`. In function prototypes, the name of the `parameter / formal parameter` can be ignored, you just need to keep the types.
+  
+    
+  
+  - ***function polymorphism / function overloading***
+  
+    In C, you are not allowed to write the code like this:
+    
+    ````c
+    ...
+    void swap(int, int);
+    void swap(int*, int*);
+    ```
+    swap(a, b);
+    swap(&a, &b);
+    ...
+    ````
+    
+    You'll get a bunch of error:
+    
+    ```C
+    error: conflicting types for 'swap'; have 'void(int *, int *)'
+        4 | void swap(int*, int*);
+          |      ^~~~
+    note: previous declaration of 'swap' with type 'void(int,  int)'
+        3 | void swap(int, int);
+          |      ^~~~
+    In function 'main':
+    warning: passing argument 1 of 'swap' makes pointer from integer without a cast [-Wint-conversion]
+        9 |     swap(a, b);
+          |          ^
+          |          |
+          |          int
+    note: expected 'int *' but argument is of type 'int'
+        4 | void swap(int*, int*);
+          |           ^~~~
+    warning: passing argument 2 of 'swap' makes pointer from integer without a cast [-Wint-conversion]
+        9 |     swap(a, b);
+          |             ^
+          |             |
+          |             int
+    note: expected 'int *' but argument is of type 'int'
+        4 | void swap(int*, int*);
+          |                 ^~~~
+    At top level:
+    error: conflicting types for 'swap'; have 'void(int *, int *)'
+       19 | void swap(int* p, int* q) {
+          |      ^~~~
+    note: previous definition of 'swap' with type 'void(int,  int)'
+       15 | void swap(int p, int q) {
+          |      ^~~~
+    ```
+    
+    ​	But just like you saw before, it's not only allowed in C++, but also very very very widely used.	
+    
+    ​	***Function polymorphism*** is a neat C++ addition to C’s capabilities. Whereas default arguments let you call the same function by using varying numbers of arguments, function polymorphism, also called ***function overloading***, lets you use multiple functions sharing the same name. The word polymorphism means having many forms, so function polymorphism lets a function have many forms. Similarly, the expression function overloading means you can attach more than one function to the same name, thus overloading the name. Both expressions boil down to the same thing, but we’ll usually use the expression function overloading—it sounds harder working. You can use function overloading to design a family of functions that do essentially the same thing but using different argument lists.
+    
+    ​	The key to function overloading is a function’s argument list, also called the ***function signature***. If two functions use the same number and types of arguments in the same order, they have the same signature; the variable names don’t matter. C++ enables you to define two functions by the same name, provided that the functions have different signatures. The signature can differ in the number of arguments or in the type of arguments, or both. For example, you can define a set of print() functions with the following prototypes:
+    
+    ```cpp
+    void print(const char* str, int width);	// #1
+    void print(double d, int width);		// #2
+    void print(long l, int width);			// #3
+    void print(int i, int width);			// #4
+    void print(const char* str);			// #5
+    ```
+    
+    ​	When you then use a print() function, the compiler matches your use to the prototype that has the same signature:
+    
+    ```cpp
+    print("Pancakes", 15);		// use #1
+    print("Syrup");				// use #5
+    print(1999.0, 10);			// use #2
+    print(1999, 12);			// use #4
+    print(1999L, 15);			// use #3
+    ```
+    
+    ​	When you use overloaded functions, you need to be sure you use the proper argument types in the function call. For example, consider the following statements:
+    
+    ```cpp
+    unsigned int year = 2023;
+    print(year, 6);				// ambiguous call
+    ```
+    
+    ​	Which prototype does the print() call match here? It doesn’t match any of them! A lack of a matching prototype doesn’t automatically rule out using one of the functions because C++ will try to use standard type conversions to force a match. If, say, the only print() prototype were #2, the function call print(year, 6) would convert the year value to type double. But in the earlier code there are three prototypes that take a number as the first argument, providing three different choices for converting year. Faced with this ambiguous situation, C++ rejects the function call as an error.
+    
+    ```cpp
+    error: call of overloaded 'print(unsigned int&, int)' is ambiguous
+       19 |     print(year, 6);
+          |     ~~~~~^~~~~~~~~
+    note: candidate: 'void print(double, int)'
+       10 | void print(double d, int width);
+          |      ^~~~~
+    note: candidate: 'void print(long int, int)'
+       11 | void print(long l, int width);
+          |      ^~~~~
+    note: candidate: 'void print(int, int)'
+       12 | void print(int i, int width);
+          |      ^~~~~
+    ```
+    
+    ​	Some signatures that appear to be different from each other nonetheless can’t coexist. For example, remember the code we gave at first? Can I change the name of `swapReference()` to `swap()`? The answer is **no**! We'll explain it later when we talk about reference.
+    
+    ​	Keep in mind that the signature, not the function type, enables function overloading. For example, the following two declarations are incompatible:
+    
+    ```cpp
+    long gronk(int n, float m);		// same signatures
+    double gronk(int n, float m);	// hence not allowed
+    
+    error: ambiguating new declaration of 'double gronk(int, float)'
+       10 | double gronk(int n, float m);
+          |        ^~~~~
+    note: old declaration 'long int gronk(int, float)'
+        9 | long gronk(int n, float m);
+    ```
+    
+    ​	Therefore, C++ doesn’t permit you to overload gronk() in this fashion. You can have different return types, but only if the signatures are also different:
+    
+    ```cpp
+    long gronk(int n, float m);
+    double gronk(double n, float m);
+    ```
+    
     
 
 
@@ -218,6 +356,8 @@ void swapReference(int& a, int& b) {
 - ***type alias***
 
   we said before
+
+- ***const && constexpr***
 
 - the ***auto*** keyword
 
@@ -251,11 +391,11 @@ void swapReference(int& a, int& b) {
   }
   ```
 
-  
-
 - ***array***
 
 - ***pointer***
+
+  - ***void* ***
 
 - ***reference***
 
